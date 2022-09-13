@@ -9,6 +9,7 @@ require (
 	github.com/rs/xid v1.4.0
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/zeromicro/go-zero v1.4.0
+	golang.org/x/time v0.0.0-20220411224347-583f2d630306
 )
 
 require (

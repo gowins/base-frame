@@ -1,4 +1,4 @@
-package zero_gin
+package ginhelper
 
 import (
 	"testing"

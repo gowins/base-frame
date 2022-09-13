@@ -1,4 +1,4 @@
-package zero_gin
+package ginhelper
 
 import (
 	"bytes"
@@ -132,10 +132,10 @@ func Test_zeroGin(t *testing.T) {
 	})
 }
 
-func testHttpRequest(method, path string, body interface{}, r ZeroGinInterface) *httptest.ResponseRecorder {
+func testHttpRequest(method, path string, body interface{}, r ZeroGinRouter) *httptest.ResponseRecorder {
 	bs, _ := json.Marshal(body)
 	req, _ := http.NewRequest(method, path, bytes.NewReader(bs))
 	writer := httptest.NewRecorder()
-	r.(*ZeroGinRouter).Engine.ServeHTTP(writer, req)
+	r.(*ginRouter).Engine.ServeHTTP(writer, req)
 	return writer
 }

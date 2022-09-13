@@ -1,4 +1,4 @@
-package zero_gin
+package ginhelper
 
 import (
 	"net/http"
@@ -9,33 +9,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ZeroGinInterface interface {
+type ZeroGinRouter interface {
 	gin.IRouter
 	Run()
 	Shutdown()
 }
 
-type ZeroGinRouter struct {
+type ginRouter struct {
 	*gin.Engine
 	server *rest.Server
 }
 
-func NewZeroGinRouter(c rest.RestConf) ZeroGinInterface {
+func NewZeroGinRouter(c rest.RestConf) ZeroGinRouter {
 	g := gin.New()
 	g.Use(gin.Recovery()) // 默认注册recovery
 	zg := &zeroGin{g}
-	r := &ZeroGinRouter{Engine: g}
+	r := &ginRouter{Engine: g}
 	r.server = rest.MustNewServer(c, rest.WithRouter(zg))
 	return r
 }
 
 // Run 启动
-func (r *ZeroGinRouter) Run() {
+func (r *ginRouter) Run() {
 	r.server.Start()
 }
 
 // Shutdown 停止
-func (r *ZeroGinRouter) Shutdown() {
+func (r *ginRouter) Shutdown() {
 	r.server.Stop()
 }
 
