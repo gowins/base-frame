@@ -1,31 +1,11 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-
-	"base-frame/service/demo/internal/config"
-	"base-frame/service/demo/internal/handler"
-	"base-frame/service/demo/internal/svc"
-
-	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/rest"
+	base_frame "base-frame"
+	"base-frame/cmd/zerocmd"
 )
 
-var configFile = flag.String("f", "etc/demo-api.yaml", "the config file")
-
 func main() {
-	flag.Parse()
-
-	var c config.Config
-	conf.MustLoad(*configFile, &c)
-
-	server := rest.MustNewServer(c.RestConf)
-	defer server.Stop()
-
-	ctx := svc.NewServiceContext(c)
-	handler.RegisterHandlers(server, ctx)
-
-	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
-	server.Start()
+	zc := zerocmd.New()
+	base_frame.Start("test", "base-frame", zc)
 }
