@@ -1,65 +1,21 @@
 package main
 
 import (
-	logger "base-frame/common/logger"
-	"context"
-	"time"
-
-	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/gowins/dionysus/log"
 )
 
 func main() {
-	logger.Setup()
-
-	logx.Info("88888")
-
-	logger.Infow("infow foo",
-		logger.Field("url", "http://localhost:8080/hello"),
-		logger.Field("attempt", 3),
-		logger.Field("backoff", time.Second),
-	)
-	logger.Errorw("errorw foo",
-		logger.Field("url", "http://localhost:8080/hello"),
-		logger.Field("attempt", 3),
-		logger.Field("backoff", time.Second),
-	)
-	logger.Sloww("sloww foo",
-		logger.Field("url", "http://localhost:8080/hello"),
-		logger.Field("attempt", 3),
-		logger.Field("backoff", time.Second),
-	)
-	logger.Error("error")
-	logger.Infov(map[string]interface{}{
-		"url":     "localhost:8080/hello",
-		"attempt": 3,
-		"backoff": time.Second,
-		"value":   "foo",
-	})
+	opts := []log.Option{ // 根据实际需求添加option
+		log.WithLevelEnabler(log.DebugLevel),
+		log.WithEncoderCfg(log.NewEncoderConfig()),
+		log.AddCallerSkip(1),
+		log.AddCaller(),
+	}
+	//todo: opts隐藏与否
+	logger, _ := log.New(log.ZapLogger, opts...)
+	logger.WithField("url", "http://localhost:8080/hello").Infof("infow foo")
+	logger.WithField("url", "http://localhost:8080/hello").Errorf("errorw foo")
 
 	logger.Error("error")
 	logger.Errorf("error %s", "foo")
-	logger.Errorv(map[string]interface{}{})
-	logger.Errorw("errorw foo")
-	logger.Info("info")
-	log := logger.WithContext(context.Background())
-	log.Info()
-
-	logger.WithDuration(1100*time.Microsecond).Infow("infow withduration",
-		logger.Field("url", "localhost:8080/hello"),
-		logger.Field("attempt", 3),
-		logger.Field("backoff", time.Second),
-	)
-	logger.WithContext(context.Background()).WithDuration(1100*time.Microsecond).Errorw(
-		"errorw withcontext withduration",
-		logger.Field("url", "localhost:8080/hello"),
-		logger.Field("attempt", 3),
-		logger.Field("backoff", time.Second),
-	)
-	logger.WithDuration(1100*time.Microsecond).WithContext(context.Background()).Errorw(
-		"errorw withduration withcontext",
-		logger.Field("url", "localhost:8080/hello"),
-		logger.Field("attempt", 3),
-		logger.Field("backoff", time.Second),
-	)
-
 }
