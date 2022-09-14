@@ -1,10 +1,11 @@
 package main
 
 import (
-	"base-frame/ginhelper"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/gowins/dionysus/ginhelper"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"

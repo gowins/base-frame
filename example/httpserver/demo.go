@@ -3,8 +3,9 @@ package main
 import (
 	base "base-frame"
 	"base-frame/cmd/zerogin"
-	"base-frame/ginhelper"
 	"net/http"
+
+	"github.com/gowins/dionysus/ginhelper"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"

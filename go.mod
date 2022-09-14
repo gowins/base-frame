@@ -6,14 +6,14 @@ require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/gin-contrib/timeout v0.0.3
 	github.com/gin-gonic/gin v1.8.1
-	github.com/gowins/dionysus v0.0.0-20220913122939-dd7fd9e8d604
+	github.com/gowins/dionysus v0.0.0-20220914082353-eb97543f71fa
 	github.com/rs/xid v1.4.0
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/zeromicro/go-zero v1.4.0
 	go.uber.org/zap v1.23.0
-	golang.org/x/time v0.0.0-20220411224347-583f2d630306
+	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9
 )
 
 require (

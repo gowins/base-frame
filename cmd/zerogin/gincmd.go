@@ -2,13 +2,12 @@ package zerogin
 
 import (
 	"base-frame/cmd"
-	"base-frame/ginhelper"
 	"os"
 	"sync"
 
-	"github.com/spf13/pflag"
-
+	"github.com/gowins/dionysus/ginhelper"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 const (
