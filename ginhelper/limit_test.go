@@ -2,8 +2,11 @@ package ginhelper
 
 import (
 	"encoding/json"
+	"net/http"
 	"sync"
 	"testing"
+
+	"github.com/gin-gonic/gin/render"
 
 	"github.com/gin-gonic/gin"
 
@@ -14,10 +17,10 @@ func TestLimiterMiddleware(t *testing.T) {
 	Convey("限流", t, func() {
 		limit := 10
 
-		r := NewZeroGinRouter(c)
+		r := NewZeroGinRouter()
 		r.Use(LimiterMiddleware(limit))
-		r.GET("/limiter", func(c *gin.Context) {
-			c.JSON(200, Response{Code: 200})
+		r.Handle(http.MethodGet, "/limiter", func(c *gin.Context) render.Render {
+			return Success(struct{}{})
 		})
 
 		wg := sync.WaitGroup{}

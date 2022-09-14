@@ -12,11 +12,6 @@ type ZeroGinRouter interface {
 	Group(path string, handler ...GinHandler) ZeroGinRouter
 }
 
-type ZeroGinServer interface {
-	Run() error
-	Shutdown() error
-}
-
 type GinRouter struct {
 	ginGroup
 

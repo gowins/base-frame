@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/zeromicro/go-zero/rest/httpx"
+	"github.com/gin-gonic/gin/render"
 
 	"github.com/gin-contrib/timeout"
 	"github.com/gin-gonic/gin"
@@ -25,13 +25,9 @@ var (
 
 func TestNewGinRouter(t *testing.T) {
 	Convey("new router", t, func() {
-		r := NewZeroGinRouter(c)
-		r.GET("/test-router", func(ctx *gin.Context) {
-			ctx.JSON(200, map[string]interface{}{
-				"code": 200,
-				"msg":  "success",
-				"data": []string{},
-			})
+		r := NewZeroGinRouter()
+		r.Handle("GET", "/test-router", func(ctx *gin.Context) render.Render {
+			return Success(struct{}{})
 		})
 
 		res := testHttpRequest("GET", "/", nil, r)
@@ -47,46 +43,41 @@ func TestNewGinRouter(t *testing.T) {
 
 func TestNewGinRouter2(t *testing.T) {
 	Convey("集成go-zero", t, func() {
-		r := NewZeroGinRouter(c)
+		r := NewZeroGinRouter()
 
-		r.GET("/test-router", func(ctx *gin.Context) {
-			ctx.JSON(200, map[string]interface{}{
-				"code": 200,
-				"msg":  "success",
-				"data": []string{},
-			})
+		r.Handle("GET", "/test-router", func(ctx *gin.Context) render.Render {
+			return Success(struct{}{})
 		})
 		go func() {
-			r.Run()
+			_ = r.Run(":9999")
 		}()
 
 		res := testHttpRequest("GET", "/test-router", nil, r)
 		So(res.Code, ShouldEqual, 200)
 
-		r.Shutdown()
-
+		_ = r.Shutdown()
 	})
 }
 
 func TestAddRouter(t *testing.T) {
 	Convey("增加路由", t, func() {
-		r := NewZeroGinRouter(c)
+		r := NewZeroGinRouter()
 		ag := r.Group("/admin/v1")
 		ug := ag.Group("user")
-		ug.Any("add", func(ctx *gin.Context) {
-			ctx.JSON(200, map[string]interface{}{})
+		ug.Handle(http.MethodGet, "add", func(ctx *gin.Context) render.Render {
+			return Success(struct{}{})
 		})
-		ug.Any("delete", func(ctx *gin.Context) {
-			ctx.JSON(200, map[string]interface{}{})
+		ug.Handle(http.MethodGet, "delete", func(ctx *gin.Context) render.Render {
+			return Success(struct{}{})
 		})
-		ug.Any("update", func(ctx *gin.Context) {
-			ctx.JSON(200, map[string]interface{}{})
+		ug.Handle(http.MethodGet, "update", func(ctx *gin.Context) render.Render {
+			return Success(struct{}{})
 		})
-		ug.Any("list", func(ctx *gin.Context) {
-			ctx.JSON(200, map[string]interface{}{})
+		ug.Handle(http.MethodGet, "list", func(ctx *gin.Context) render.Render {
+			return Success(struct{}{})
 		})
-		ug.Any("detail", func(ctx *gin.Context) {
-			ctx.JSON(200, map[string]interface{}{})
+		ug.Handle(http.MethodGet, "detail", func(ctx *gin.Context) render.Render {
+			return Success(struct{}{})
 		})
 
 		r.Use(gin.Recovery())
@@ -94,48 +85,10 @@ func TestAddRouter(t *testing.T) {
 	})
 }
 
-func Test_zeroGin(t *testing.T) {
-	Convey("zeroGin", t, func() {
-		notFound := false
-		notAllow := false
-		zg := zeroGin{g: gin.New()}
-		zg.g.HandleMethodNotAllowed = true
-		zg.g.GET("/test", func(c *gin.Context) {
-			c.JSON(http.StatusOK, nil)
-		})
-		zg.SetNotFoundHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			notFound = true
-		}))
-		zg.SetNotAllowedHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			notAllow = true
-		}))
-		req, _ := http.NewRequest("GET", "/notFound", nil)
-		writer := httptest.NewRecorder()
-		zg.ServeHTTP(writer, req)
-		So(notFound, ShouldBeTrue)
-
-		req, _ = http.NewRequest("POST", "/test", nil)
-		writer = httptest.NewRecorder()
-		zg.ServeHTTP(writer, req)
-		So(notAllow, ShouldBeTrue)
-
-		err := zg.Handle(http.MethodGet, "/a/b",
-			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				httpx.Ok(w)
-			}),
-		)
-		So(err, ShouldBeNil)
-		req, _ = http.NewRequest("GET", "/a/b", nil)
-		writer = httptest.NewRecorder()
-		zg.ServeHTTP(writer, req)
-		So(writer.Code, ShouldEqual, http.StatusOK)
-	})
-}
-
-func testHttpRequest(method, path string, body interface{}, r ZeroGinRouter) *httptest.ResponseRecorder {
+func testHttpRequest(method, path string, body interface{}, r *GinRouter) *httptest.ResponseRecorder {
 	bs, _ := json.Marshal(body)
 	req, _ := http.NewRequest(method, path, bytes.NewReader(bs))
 	writer := httptest.NewRecorder()
-	r.(*ginRouter).Engine.ServeHTTP(writer, req)
+	r.engine.ServeHTTP(writer, req)
 	return writer
 }

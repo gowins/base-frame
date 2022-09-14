@@ -1,8 +1,11 @@
 package ginhelper
 
 import (
+	"net/http"
 	"testing"
 	"time"
+
+	"github.com/gin-gonic/gin/render"
 
 	"github.com/gin-gonic/gin"
 	. "github.com/smartystreets/goconvey/convey"
@@ -10,11 +13,11 @@ import (
 
 func TestTimeout(t *testing.T) {
 	Convey("超时", t, func() {
-		r := NewZeroGinRouter(c)
+		r := NewZeroGinRouter()
 		r.Use(TimeoutMiddleware(1000))
-		r.GET("timeout", func(c *gin.Context) {
+		r.Handle(http.MethodGet, "timeout", func(c *gin.Context) render.Render {
 			time.Sleep(2 * time.Second)
-			c.JSON(200, map[string]interface{}{})
+			return Success(struct{}{})
 		})
 
 		res := testHttpRequest("GET", "/timeout", nil, r)
