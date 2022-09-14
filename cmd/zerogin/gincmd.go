@@ -4,30 +4,48 @@ import (
 	"base-frame/cmd"
 	"base-frame/ginhelper"
 	"os"
+	"sync"
 
 	"github.com/spf13/pflag"
-
-	"github.com/zeromicro/go-zero/rest"
 
 	"github.com/spf13/cobra"
 )
 
-type ginCommand struct {
-	g *ginhelper.GinRouter
+const (
+	WebServerAddr = "GAPI_ADDR"
+	addrFlagName  = "addr"
+)
 
+var (
+	defaultWebServerAddr = ":8080"
+)
+
+type ginCommand struct {
+	g   *ginhelper.GinRouter
 	cmd *cobra.Command
+
+	addr string
+
+	once sync.Once
 }
 
-func NewGinCommand(rc rest.RestConf) *ginCommand {
+func NewGinCommand() *ginCommand {
 	return &ginCommand{
-		g:   ginhelper.NewZeroGinRouter(rc),
-		cmd: &cobra.Command{Use: "zero", Short: "Run as go-zero server"},
+		g:   ginhelper.NewZeroGinRouter(),
+		cmd: &cobra.Command{Use: "gin", Short: "Run as go-zero server"},
 	}
 }
 
 func (t *ginCommand) GetCmd() *cobra.Command {
-	t.cmd.Run = func(cmd *cobra.Command, args []string) {
-		t.g.Run()
+	t.once.Do(func() {
+		if envAddr := os.Getenv(WebServerAddr); envAddr != "" {
+			defaultWebServerAddr = envAddr
+		}
+		t.cmd.Flags().StringVarP(&t.addr, addrFlagName, "a", defaultWebServerAddr, "the http server address")
+	})
+
+	t.cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		return t.g.Run(t.addr)
 	}
 	return t.cmd
 }
@@ -47,19 +65,16 @@ func (t *ginCommand) Flags() *pflag.FlagSet {
 }
 
 func (t *ginCommand) RegPreRunFunc(value string, priority cmd.Priority, f func() error) error {
-	t.cmd.PreRunE = func(cmd *cobra.Command, args []string) error {
-		return f()
-	}
 	return nil
 }
 
 func (t *ginCommand) RegPostRunFunc(value string, priority cmd.Priority, f func() error) error {
-	t.cmd.PostRun = func(cmd *cobra.Command, args []string) {
-		t.g.Shutdown()
+	t.cmd.PostRunE = func(cmd *cobra.Command, args []string) error {
+		return t.g.Shutdown()
 	}
 	return nil
 }
 
-func (t *ginCommand) GetZeroGinRouter() ginhelper.ZeroGinRouter {
+func (t *ginCommand) GetEngine() ginhelper.ZeroGinRouter {
 	return t.g
 }

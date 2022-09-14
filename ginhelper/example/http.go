@@ -8,14 +8,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
-	"github.com/zeromicro/go-zero/rest"
 )
 
 func main() {
-	r := ginhelper.NewZeroGinRouter(rest.RestConf{
-		Host: "0.0.0.0",
-		Port: 9999,
-	})
+	r := ginhelper.NewZeroGinRouter()
 	r.Use(gin.Logger())
 	r.Handle(http.MethodGet, "test", func(c *gin.Context) render.Render {
 		return ginhelper.Success(time.Now().Unix())
@@ -42,5 +38,5 @@ func main() {
 	})
 
 	defer r.Shutdown()
-	r.Run()
+	r.Run(":9999")
 }

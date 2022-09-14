@@ -1,7 +1,8 @@
 package ginhelper
 
 import (
-	"github.com/zeromicro/go-zero/rest"
+	"context"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,29 +13,29 @@ type ZeroGinRouter interface {
 }
 
 type ZeroGinServer interface {
-	Run()
-	Shutdown()
+	Run() error
+	Shutdown() error
 }
 
 type GinRouter struct {
 	ginGroup
 
 	engine *gin.Engine
-	server *rest.Server
-
-	root bool
+	server *http.Server
+	root   bool
 }
 
-func NewZeroGinRouter(c rest.RestConf) *GinRouter {
+func NewZeroGinRouter() *GinRouter {
 	g := gin.New()
 	g.Use(gin.Recovery()) // 默认注册recovery
-	zg := &zeroGin{g}
 	r := &GinRouter{
 		ginGroup: ginGroup{g: &g.RouterGroup},
 		engine:   g,
-		root:     true,
+		server: &http.Server{
+			Handler: g.Handler(),
+		},
+		root: true,
 	}
-	r.server = rest.MustNewServer(c, rest.WithRouter(zg))
 	return r
 }
 
@@ -45,22 +46,22 @@ func (r *GinRouter) Group(path string, handler ...GinHandler) ZeroGinRouter {
 			g: g,
 		},
 		engine: r.engine,
-		server: r.server,
 	}
 }
 
 // Run 启动
-func (r *GinRouter) Run() {
-	if r.root {
-		r.server.Start()
-	} else {
-
+func (r *GinRouter) Run(addr string) error {
+	r.server.Addr = addr
+	if err := r.server.ListenAndServe(); err != nil {
+		return err
 	}
+	return nil
 }
 
 // Shutdown 停止
-func (r *GinRouter) Shutdown() {
-	if r.root {
-		r.server.Stop()
+func (r *GinRouter) Shutdown() error {
+	if err := r.server.Shutdown(context.Background()); err != nil {
+		return err
 	}
+	return nil
 }
