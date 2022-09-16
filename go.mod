@@ -12,7 +12,6 @@ require (
 )
 
 require (
-	github.com/apache/rocketmq-client-go/v2 v2.1.1 // indirect
 	github.com/rs/xid v1.4.0 // indirect
 	gorm.io/gen v0.3.16
 	gorm.io/gorm v1.23.9-0.20220713102635-3262daf8d468
