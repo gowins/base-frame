@@ -1,4 +1,4 @@
-package rmq
+package rmqlog
 
 import (
 	"context"

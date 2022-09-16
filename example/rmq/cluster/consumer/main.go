@@ -1,6 +1,7 @@
 package main
 
 import (
+	"base-frame/rmqlog"
 	"context"
 	"fmt"
 
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	rmqlog.SetLogger()
 	client, err := rmq.NewConsumer(&rmq.ConsumerConfig{
 		NameSrvAddr:    []string{"http://rmq-cn-zvp2ud6lc0e.cn-hangzhou.rmq.aliyuncs.com:8080"},
 		GroupName:      "hltv_g",

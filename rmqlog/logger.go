@@ -1,4 +1,4 @@
-package rmq
+package rmqlog
 
 import (
 	"github.com/apache/rocketmq-client-go/v2/rlog"
