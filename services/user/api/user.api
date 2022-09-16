@@ -17,8 +17,10 @@ type (
 // service block
 @server(
 	group: foo/v1
+	middleware: ginx.TimeoutMiddleware(1000)
 )
 service user-api {
 	@handler login
 	post /user/login (LoginReq) returns (LoginReply)
+
 }
