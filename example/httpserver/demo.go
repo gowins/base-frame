@@ -13,8 +13,7 @@ import (
 
 func main() {
 	ginCmd := cmd.NewGinCommand()
-	engine := ginCmd.GetEngine()
-	addRoute(engine)
+	addRoute(ginCmd)
 	base.Start("structure", "msg-srv", ginCmd)
 }
 

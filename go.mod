@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/gin-gonic/gin v1.8.1
-	github.com/gowins/dionysus v0.0.0-20220916055124-8a00fcb7006a
+	github.com/gowins/dionysus v0.0.0-20220916071010-fb153b951f7b
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/zeromicro/go-zero v1.4.0

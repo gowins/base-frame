@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+	"net/http"
 	"os"
 	"sync"
 
@@ -19,18 +21,20 @@ var (
 )
 
 type ginCommand struct {
-	g   *ginx.GinRouter
-	cmd *cobra.Command
+	ginx.ZeroGinRouter
 
-	addr string
+	cmd    *cobra.Command
+	server *http.Server
+	addr   string
 
 	once sync.Once
 }
 
 func NewGinCommand() *ginCommand {
 	return &ginCommand{
-		g:   ginx.NewZeroGinRouter(),
-		cmd: &cobra.Command{Use: "gin", Short: "Run as go-zero server"},
+		ZeroGinRouter: ginx.NewZeroGinRouter(),
+		cmd:           &cobra.Command{Use: "gin", Short: "Run as go-zero server"},
+		server:        &http.Server{},
 	}
 }
 
@@ -40,10 +44,13 @@ func (t *ginCommand) GetCmd() *cobra.Command {
 			defaultWebServerAddr = envAddr
 		}
 		t.cmd.Flags().StringVarP(&t.addr, addrFlagName, "a", defaultWebServerAddr, "the http server address")
+
+		t.server.Handler = t.Handler()
 	})
 
 	t.cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		return t.g.Run(t.addr)
+		t.server.Addr = t.addr
+		return t.server.ListenAndServe()
 	}
 	return t.cmd
 }
@@ -63,16 +70,21 @@ func (t *ginCommand) Flags() *pflag.FlagSet {
 }
 
 func (t *ginCommand) RegPreRunFunc(value string, f func() error) error {
+	t.cmd.PreRunE = func(cmd *cobra.Command, args []string) error {
+		return f()
+	}
 	return nil
 }
 
 func (t *ginCommand) RegPostRunFunc(value string, f func() error) error {
 	t.cmd.PostRunE = func(cmd *cobra.Command, args []string) error {
-		return t.g.Shutdown()
+		if err := f(); err != nil {
+			return err
+		}
+		if err := t.server.Shutdown(context.TODO()); err != nil {
+			return err
+		}
+		return nil
 	}
 	return nil
-}
-
-func (t *ginCommand) GetEngine() ginx.ZeroGinRouter {
-	return t.g
 }

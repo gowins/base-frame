@@ -11,7 +11,7 @@ import (
   {{.importPackages}}
 )
 
-func {{.HandlerName}}(c *gin.Context) render.Render {
+func {{.HandlerName}}(c *gin.Context) ginx.Render {
     {{if .HasRequest}}var req types.{{.RequestType}}
     if err := c.ShouldBind(&req); err != nil {
         return ginx.Error(ginx.GinErrorParams)
