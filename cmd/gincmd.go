@@ -4,7 +4,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/gowins/dionysus/ginhelper"
+	"github.com/gowins/dionysus/ginx"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -19,7 +19,7 @@ var (
 )
 
 type ginCommand struct {
-	g   *ginhelper.GinRouter
+	g   *ginx.GinRouter
 	cmd *cobra.Command
 
 	addr string
@@ -29,7 +29,7 @@ type ginCommand struct {
 
 func NewGinCommand() *ginCommand {
 	return &ginCommand{
-		g:   ginhelper.NewZeroGinRouter(),
+		g:   ginx.NewZeroGinRouter(),
 		cmd: &cobra.Command{Use: "gin", Short: "Run as go-zero server"},
 	}
 }
@@ -62,17 +62,17 @@ func (t *ginCommand) Flags() *pflag.FlagSet {
 	return t.cmd.Flags()
 }
 
-func (t *ginCommand) RegPreRunFunc(value string, priority Priority, f func() error) error {
+func (t *ginCommand) RegPreRunFunc(value string, f func() error) error {
 	return nil
 }
 
-func (t *ginCommand) RegPostRunFunc(value string, priority Priority, f func() error) error {
+func (t *ginCommand) RegPostRunFunc(value string, f func() error) error {
 	t.cmd.PostRunE = func(cmd *cobra.Command, args []string) error {
 		return t.g.Shutdown()
 	}
 	return nil
 }
 
-func (t *ginCommand) GetEngine() ginhelper.ZeroGinRouter {
+func (t *ginCommand) GetEngine() ginx.ZeroGinRouter {
 	return t.g
 }

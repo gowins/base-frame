@@ -4,18 +4,13 @@ package handler
 import (
 	"net/http"
 
-	"book/service/user/api/internal/svc"
-	foov1 "book/service/user/api/internal/handler/foo/v1"
-
-	"github.com/zeromicro/go-zero/rest"
+	"github.com/gowins/dionysus/ginx"
 )
 
-func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
-	[]rest.Route{
-		{
-			Method:  http.MethodPost,
-			Path:    "/user/login",
-			Handler: foov1.LoginHandler(serverCtx),
-		},
-},
+func RegisterHandlers(gr ginx.ZeroGinRouter) {
+	adminv1Group := gr.Group("admin/v1")
+	adminv1Group.Use(ginx.TimeoutMiddleware(1000))
+	adminv1Group.Use(ginx.LimiterMiddleware(1000))
+	adminv1Group.Handle(http.MethodPost, "/task/list", taskv1.List)
+	adminv1Group.Handle(http.MethodPost, "/task/get", taskv1.List)
 }
