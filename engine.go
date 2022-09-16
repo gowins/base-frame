@@ -1,11 +1,12 @@
 package base_frame
 
 import (
-	"base-frame/cmd"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"base-frame/cmd"
 
 	"github.com/spf13/cobra"
 )
@@ -42,7 +43,7 @@ func NewDio() *Dio {
 	return d
 }
 
-func Start(department, project string, cmds ...cmd.Commander) {
+func Start(project string, cmds ...cmd.Commander) {
 	// 0 set cmd use
 	dio.cmd.Use = project
 	if ex, err := os.Executable(); dio.cmd.Use == "" && err == nil {
@@ -50,7 +51,7 @@ func Start(department, project string, cmds ...cmd.Commander) {
 	}
 
 	// 1. global flags
-	var pname, dname, configPath string
+	var pname, configPath string
 	var version bool
 	// var registryVal string
 	dio.cmd.PersistentFlags().StringVarP(&configPath, "config", "c", os.Getenv("GAPI_CONFIG"), "deprecated: the config file path")
@@ -72,12 +73,12 @@ func Start(department, project string, cmds ...cmd.Commander) {
 
 		// //////////////////////////////////////////////////////////////// //
 		// Department name
-		if department != "" && dname == "" {
-			dname = department
-		}
-		if dname == "" {
-			return errors.New("the department name cannot be empty")
-		}
+		//if department != "" && dname == "" {
+		//	dname = department
+		//}
+		//if dname == "" {
+		//	return errors.New("the department name cannot be empty")
+		//}
 
 		return nil
 	}

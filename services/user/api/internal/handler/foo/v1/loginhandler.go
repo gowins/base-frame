@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
 
-	"book/service/user/api/internal/types"
+	"base-frame/services/user/api/internal/types"
 )
 
 func LoginHandler(c *gin.Context) render.Render {
@@ -17,8 +17,7 @@ func LoginHandler(c *gin.Context) render.Render {
 		return ginx.Error(ginx.GinErrorParams)
 	}
 
-	l := v1.NewLoginLogic(req)
-	resp, err := l.Login(&req)
+	resp, err := v1.Login(&req)
 	if err != nil {
 		return ginx.Error(err)
 	} else {

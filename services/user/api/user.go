@@ -1,31 +1,29 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 
-	"book/service/user/api/internal/config"
-	"book/service/user/api/internal/handler"
-	"book/service/user/api/internal/svc"
+	base "base-frame"
+	"base-frame/cmd"
+	"base-frame/services/user/api/internal/config"
+	"base-frame/services/user/api/internal/handler"
 
 	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/rest"
 )
 
-var configFile = flag.String("f", "etc/user-api.yaml", "the config file")
+var configFile string
 
 func main() {
-	flag.Parse()
+
+	ginCmd := cmd.NewGinCommand()
+	ginCmd.Flags().StringVarP(&configFile, "config file", "c", "", "")
 
 	var c config.Config
-	conf.MustLoad(*configFile, &c)
+	conf.MustLoad(configFile, &c)
 
-	server := rest.MustNewServer(c.RestConf)
-	defer server.Stop()
-
-	ctx := svc.NewServiceContext(c)
-	handler.RegisterHandlers(server, ctx)
+	engine := ginCmd.GetEngine()
+	handler.RegisterHandlers(engine)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
-	server.Start()
+	base.Start("user", ginCmd)
 }
