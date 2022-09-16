@@ -21,8 +21,7 @@ func main() {
 	var c config.Config
 	conf.MustLoad(configFile, &c)
 
-	engine := ginCmd.GetEngine()
-	handler.RegisterHandlers(engine)
+	handler.RegisterHandlers(ginCmd)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	base.Start("user", ginCmd)
