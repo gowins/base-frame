@@ -9,7 +9,6 @@ import (
 	"github.com/gowins/dionysus/ginx"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/render"
 )
 
 func main() {
@@ -30,11 +29,11 @@ func addRoute(engine ginx.ZeroGinRouter) {
 	webGroup.Handle(http.MethodPost, "user/post", userPost)
 }
 
-func userGet(c *gin.Context) render.Render {
+func userGet(c *gin.Context) ginx.Render {
 	return ginx.Success("获取用户成功")
 }
 
-func userPost(c *gin.Context) render.Render {
+func userPost(c *gin.Context) ginx.Render {
 	var user = struct {
 		ID   int    `json:"id"`
 		Name string `json:"name"`
@@ -48,10 +47,10 @@ func userPost(c *gin.Context) render.Render {
 	return ginx.Success("修改用户成功")
 }
 
-func customError(c *gin.Context) render.Render {
+func customError(c *gin.Context) ginx.Render {
 	return ginx.Error(ginx.NewGinError(350001, "自定义错误"))
 }
 
-func customPanic(c *gin.Context) render.Render {
+func customPanic(c *gin.Context) ginx.Render {
 	panic("自定义panic")
 }

@@ -6,12 +6,11 @@ import (
 	"github.com/gowins/dionysus/ginx"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/render"
 
 	"book/service/user/api/internal/types"
 )
 
-func LoginHandler(c *gin.Context) render.Render {
+func LoginHandler(c *gin.Context) ginx.Render {
 	var req types.LoginReq
 	if err := c.ShouldBind(&req); err != nil {
 		return ginx.Error(ginx.GinErrorParams)
