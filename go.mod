@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.8.1
-	github.com/gowins/dionysus v0.0.0-20220916020756-7d64ab9af0c2
+	github.com/gowins/dionysus v0.0.0-20220916030915-a1ffe7fe8dc7
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/zeromicro/go-zero v1.4.0
