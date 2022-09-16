@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"base-frame/services/model"
+	"base-frame/services/user/model"
 )
 
 func newUser(db *gorm.DB) user {
