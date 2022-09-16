@@ -1,7 +1,6 @@
-package zerogin
+package cmd
 
 import (
-	"base-frame/cmd"
 	"os"
 	"sync"
 
@@ -63,11 +62,11 @@ func (t *ginCommand) Flags() *pflag.FlagSet {
 	return t.cmd.Flags()
 }
 
-func (t *ginCommand) RegPreRunFunc(value string, priority cmd.Priority, f func() error) error {
+func (t *ginCommand) RegPreRunFunc(value string, priority Priority, f func() error) error {
 	return nil
 }
 
-func (t *ginCommand) RegPostRunFunc(value string, priority cmd.Priority, f func() error) error {
+func (t *ginCommand) RegPostRunFunc(value string, priority Priority, f func() error) error {
 	t.cmd.PostRunE = func(cmd *cobra.Command, args []string) error {
 		return t.g.Shutdown()
 	}

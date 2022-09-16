@@ -1,9 +1,10 @@
 package main
 
 import (
+	"net/http"
+
 	base "base-frame"
 	"base-frame/cmd/zerogin"
-	"net/http"
 
 	"github.com/gowins/dionysus/ginhelper"
 
@@ -19,12 +20,13 @@ func main() {
 }
 
 func addRoute(engine ginhelper.ZeroGinRouter) {
-	engine.Use(gin.Logger())
 	adminGroup := engine.Group("admin/v1")
 	adminGroup.Handle(http.MethodGet, "user/get", userGet)
 	adminGroup.Handle(http.MethodPost, "user/post", userPost)
-	adminGroup.Handle(http.MethodPost, "error", customError)
-	adminGroup.Handle(http.MethodPost, "panic", customPanic)
+
+	webGroup := engine.Group("web/v1")
+	webGroup.Handle(http.MethodGet, "user/get", userGet)
+	webGroup.Handle(http.MethodPost, "user/post", userPost)
 }
 
 func userGet(c *gin.Context) render.Render {
