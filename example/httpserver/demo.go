@@ -14,7 +14,7 @@ import (
 func main() {
 	ginCmd := cmd.NewGinCommand()
 	addRoute(ginCmd)
-	base.Start("structure", "msg-srv", ginCmd)
+	base.Start("msg-srv", ginCmd)
 }
 
 func addRoute(engine ginx.ZeroGinRouter) {
