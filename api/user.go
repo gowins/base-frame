@@ -3,11 +3,8 @@ package main
 import (
 	"fmt"
 
-	base "base-frame"
-	"base-frame/cmd"
-	"base-frame/log"
-	"base-frame/services/user/api/internal/config"
-	"base-frame/services/user/api/internal/handler"
+	"base-frame/api/internal/config"
+	"base-frame/api/internal/handler"
 
 	"github.com/zeromicro/go-zero/core/conf"
 )
