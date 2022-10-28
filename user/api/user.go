@@ -5,6 +5,7 @@ import (
 
 	base "base-frame"
 	"base-frame/cmd"
+	"base-frame/log"
 	"base-frame/services/user/api/internal/config"
 	"base-frame/services/user/api/internal/handler"
 
@@ -14,7 +15,8 @@ import (
 var configFile string
 
 func main() {
-
+	log.Setup(log.SetProjectName("Test"))
+	log.Debug("haha")
 	ginCmd := cmd.NewGinCommand()
 	ginCmd.Flags().StringVarP(&configFile, "config file", "c", "", "")
 
