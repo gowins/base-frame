@@ -1,15 +1,17 @@
 package middleware
 
 import (
-	"fmt"
-	"time"
+	"base-frame/service/bar-single/internal/logic"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Auth(c *gin.Context) {
-	demoValue := time.Now().String() + " authMiddle"
-	fmt.Printf("this auth middleware\n")
-	c.Set("authMiddle", demoValue)
-	c.Next()
+	if logic.Authentication(c) {
+		c.Next()
+	} else {
+		//如不想在执行其它中间件及handler函数，请调用c.AbortXXX
+		c.AbortWithStatus(http.StatusForbidden)
+	}
 }

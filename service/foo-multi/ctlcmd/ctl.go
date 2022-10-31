@@ -4,18 +4,16 @@ import (
 	"base-frame/service/foo-multi/internal/rpc_client"
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/gowins/dionysus"
 	"github.com/gowins/dionysus/cmd"
 	"github.com/gowins/dionysus/step"
-	"time"
 )
 
 var (
-	green  = string([]byte{27, 91, 51, 50, 109})
-	white  = string([]byte{27, 91, 51, 55, 109})
-	yellow = string([]byte{27, 91, 51, 51, 109})
-	red    = string([]byte{27, 91, 51, 49, 109})
-	blue   = string([]byte{27, 91, 51, 52, 109})
+	green = string([]byte{27, 91, 51, 50, 109})
+	white = string([]byte{27, 91, 51, 55, 109})
 	// magenta = string([]byte{27, 91, 51, 53, 109})
 	// cyan    = string([]byte{27, 91, 51, 54, 109})
 	// color   = []string{green, white, yellow, red, blue, magenta, cyan}
