@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"base-frame/service/bar-single/handler/example"
-	"base-frame/service/bar-single/handler/middleware"
+	"base-frame/service/bar-single/internal/handler/example"
+	"base-frame/service/bar-single/internal/handler/middleware"
 	"net/http"
 	"time"
 
