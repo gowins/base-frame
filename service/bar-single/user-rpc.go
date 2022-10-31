@@ -1,7 +1,7 @@
 package main
 
 import (
-	"base-frame/service/bar-single/user"
+	user2 "base-frame/service/foo-multi/internal/user"
 	"context"
 	"flag"
 	"fmt"
@@ -19,12 +19,12 @@ var (
 )
 
 type userServer struct {
-	user.UnimplementedUserServer
+	user2.UnimplementedUserServer
 }
 
-func (u *userServer) SayHello(ctx context.Context, req *user.HelloRequest) (*user.HelloReply, error) {
+func (u *userServer) SayHello(ctx context.Context, req *user2.HelloRequest) (*user2.HelloReply, error) {
 	log.Printf("Received: %v", req.GetName())
-	return &user.HelloReply{Message: "Hello " + req.GetName()}, nil
+	return &user2.HelloReply{Message: "Hello " + req.GetName()}, nil
 }
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 		log.Fatalf("listen address %s failure, error: %v", addr, err)
 	}
 	srv := grpc.NewServer()
-	user.RegisterUserServer(srv, &userServer{})
+	user2.RegisterUserServer(srv, &userServer{})
 	go func() {
 		log.Printf("listening on: %s", lis.Addr())
 		if err := srv.Serve(lis); err != nil {
