@@ -3,16 +3,16 @@ package rpc_client
 import (
 	user2 "base-frame/service/foo-multi/internal/user"
 	"context"
-	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func GetRPCHello() {
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:50051"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("127.0.0.1:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
