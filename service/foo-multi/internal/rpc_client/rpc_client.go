@@ -24,7 +24,8 @@ func GetRPCHello() {
 	defer cancel()
 	r, err := c.SayHello(ctx, &user2.HelloRequest{Name: "nameing"})
 	if err != nil {
-		log.Fatalf("could not sayhello: %v", err)
+		log.Printf("could not sayhello: %v", err)
+		return
 	}
 	log.Printf("Greeting: %s", r.GetMessage())
 }
