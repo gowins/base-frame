@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	base "base-frame"
-	"base-frame/multi/internal/config"
-	"base-frame/multi/internal/handler"
+	"base-frame/foo-multi/internal/config"
+	"base-frame/foo-multi/internal/handler"
 
 	"github.com/gowins/dionysus/log"
 	"github.com/zeromicro/go-zero/core/conf"
