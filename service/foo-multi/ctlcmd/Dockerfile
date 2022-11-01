@@ -19,4 +19,4 @@ COPY --from=builder /app/dio /app/dio
 #COPY --from=builder /app/etc /app/etc
 #COPY --from=builder /app/manifests /app/manifests
 
-CMD ["./dio","clt"]
+CMD ["./dio","ctl"]
