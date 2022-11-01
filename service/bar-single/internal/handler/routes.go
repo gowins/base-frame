@@ -15,6 +15,8 @@ func RegisterHandler(routers ginx.ZeroGinRouter) {
 		return ginx.Success(time.Now().Unix())
 	})
 
+	routers.Handle(http.MethodGet, "/config", example.GetConfig)
+
 	//注意这时返回默认http code状态码200, 这里的code不是http code
 	routers.Handle(http.MethodGet, "/test/error", example.TestError)
 

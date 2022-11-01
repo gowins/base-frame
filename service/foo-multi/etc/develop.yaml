@@ -1,0 +1,9 @@
+mysql:
+  host: 127.0.0.1:3306
+  user: root
+  password: root
+  database: 5e 
+  charset: utf8mb4
+  max-idle-connections: 100
+  max-open-connections: 100
+  max-connection-life-time: 10s

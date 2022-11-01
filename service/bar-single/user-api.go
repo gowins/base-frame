@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"base-frame/common/config"
+	"base-frame/common/env"
 	"base-frame/service/bar-single/internal/handler"
 	"base-frame/service/bar-single/internal/healthy_checker"
 
@@ -23,6 +25,20 @@ func main() {
 		{
 			StepName: "PrePrint1", Func: func() error {
 				fmt.Println("init orm")
+				return nil
+			},
+		},
+		// 运行环境
+		{
+			StepName: "env", Func: func() error {
+				env.Setup()
+				return nil
+			},
+		},
+		// 配置
+		{
+			StepName: "config", Func: func() error {
+				config.Setup()
 				return nil
 			},
 		},
