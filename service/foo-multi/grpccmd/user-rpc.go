@@ -1,16 +1,18 @@
 package main
 
 import (
-	"base-frame/service/foo-multi/internal/rpc_server"
-	user2 "base-frame/service/foo-multi/internal/user"
 	"flag"
 	"fmt"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"base-frame/service/foo-multi/internal/rpc_server"
+	user2 "base-frame/service/foo-multi/internal/user"
+
+	"google.golang.org/grpc"
 )
 
 var (
