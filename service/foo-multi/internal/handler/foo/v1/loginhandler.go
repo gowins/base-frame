@@ -1,13 +1,12 @@
 package v1
 
 import (
-	v1 "base-frame/services/user/api/internal/logic/foo/v1"
+	v1 "base-frame/service/foo-multi/internal/logic/foo/v1"
+	"base-frame/service/foo-multi/internal/types"
 
 	"github.com/gowins/dionysus/ginx"
 
 	"github.com/gin-gonic/gin"
-
-	"base-frame/services/user/api/internal/types"
 )
 
 func LoginHandler(c *gin.Context) ginx.Render {
