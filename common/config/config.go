@@ -1,7 +1,6 @@
 package config
 
 import (
-	"base-frame/common/env"
 	"fmt"
 	"sync"
 	"time"
@@ -17,7 +16,7 @@ var (
 )
 
 func Setup() {
-	viper.SetConfigName(env.GetRunEnv())
+	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(FilePath)
 	if err := viper.ReadInConfig(); err != nil {

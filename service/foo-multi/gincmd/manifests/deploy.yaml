@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: foo-multi-grpc
+  name: foo-multi-gin
   labels:
-    app: foo-multi-grpc
+    app: foo-multi-gin
 spec:
   selector:
     matchLabels:
-      app: foo-multi-grpc
+      app: foo-multi-gin
   template:
     metadata:
       labels:
         log: "true"
-        app: foo-multi-grpc
+        app: foo-multi-gin
     spec:
       affinity:
         podAntiAffinity:
@@ -25,25 +25,25 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - foo-multi-grpc
+                        - foo-multi-gin
           # requiredDuringSchedulingIgnoredDuringExecution:
           #   - labelSelector:
           #     matchExpressions:
           #       - key: app
           #         operator: In
           #         values:
-          #           - foo-multi-grpc
+          #           - foo-multi-gin
           #     topologyKey: "kubernetes.io/hostname"
       terminationGracePeriodSeconds: 60
       containers:
-        - name: foo-multi-grpc
+        - name: foo-multi-gin
           image: ${IMAGE}
           ports:
             - containerPort: 8080
           livenessProbe:
             exec:
               command:
-                - "./foo-multi-grpc"
+                - "./foo-multi-gin"
                 - liveness
             initialDelaySeconds: 10
             timeoutSeconds: 2
@@ -53,7 +53,7 @@ spec:
           readinessProbe:
             exec:
               command:
-                - "./foo-multi-grpc"
+                - "./foo-multi-gin"
                 - readiness
             initialDelaySeconds: 10
             timeoutSeconds: 2
@@ -76,7 +76,7 @@ spec:
       volumes:
         - name: gowins-volume
           configMap:
-            name: foo-multi-grpc-conf
+            name: foo-multi-gin-conf
       imagePullSecrets:
         - name: ggdata-dev
 
@@ -84,12 +84,12 @@ spec:
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: foo-multi-grpc
+  name: foo-multi-gin
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: foo-multi-grpc
+    name: foo-multi-gin
   minReplicas: 1
   maxReplicas: 3
   metrics:
@@ -110,13 +110,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: foo-multi-grpc
+  name: foo-multi-gin
   labels:
-    app: foo-multi-grpc
+    app: foo-multi-gin
 spec:
   type: ClusterIP
   ports:
     - port: 8080
       targetPort: 8080
   selector:
-    app: foo-multi-grpc
+    app: foo-multi-gin

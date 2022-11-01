@@ -1,20 +1,28 @@
 package handler
 
 import (
+	"base-frame/service/foo-multi/internal/handler/example"
+	"base-frame/service/foo-multi/internal/handler/middleware"
 	"net/http"
-
-	foov1 "base-frame/service/foo-multi/internal/handler/foo/v1"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gowins/dionysus/ginx"
 )
 
-func RegisterHandlers(gr ginx.ZeroGinRouter) {
-	adminv1Group := gr.Group("foo/v1")
-	adminv1Group.Use(ginx.TimeoutMiddleware(1000))
-	adminv1Group.Use(ginx.LimiterMiddleware(1000))
-	adminv1Group.Handle(http.MethodPost, "/task/get", foov1.LoginHandler)
-	adminv1Group.Handle(http.MethodGet, "/ping", func(c *gin.Context) ginx.Render {
-		return ginx.Success("pong")
+func RegisterHandler(routers ginx.ZeroGinRouter) {
+	routers.Handle(http.MethodGet, "/test", func(c *gin.Context) ginx.Render {
+		return ginx.Success(time.Now().Unix())
 	})
+
+	routers.Handle(http.MethodGet, "/config", example.GetConfig)
+
+	//注意这时返回默认http code状态码200, 这里的code不是http code
+	routers.Handle(http.MethodGet, "/test/error", example.TestError)
+
+	demogroup := routers.Group("/demogroup")
+	demogroup.Use(middleware.Auth, middleware.ContextM)
+	demogroup.Handle(http.MethodGet, "/demoroute", example.DemoRoute)
+	//会返回http code 504错误码
+	demogroup.Handle(http.MethodGet, "/error", example.HttpCode)
 }

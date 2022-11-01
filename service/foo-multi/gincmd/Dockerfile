@@ -7,16 +7,16 @@ ADD go.mod .
 ADD go.sum .
 RUN go mod download
 COPY . .
-COPY service/bar-single/etc /app/etc
-RUN go build -ldflags="-s -w" -o /app/user-api service/bar-single/user-api.go
+COPY service/foo-multi/gincmd/etc /app/etc
+RUN go build -ldflags="-s -w" -o /app/dio service/foo-multi/gincmd/gin.go
 
 FROM registry.cn-hangzhou.aliyuncs.com/5eplay/alpine:3.16.3
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/Shanghai
 ENV TZ Asia/Shanghai
 WORKDIR /app
-COPY --from=builder /app/user-api /app/user-api
+COPY --from=builder /app/dio /app/dio
 COPY --from=builder /app/etc /app/etc
 #COPY --from=builder /app/manifests /app/manifests
 
-CMD ["./user-api","gin"]
+CMD ["./dio","gin"]

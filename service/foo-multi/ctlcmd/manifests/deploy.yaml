@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foo-multi-ctl
+  labels:
+    app: foo-multi-ctl
+spec:
+  selector:
+    matchLabels:
+      app: foo-multi-ctl
+  template:
+    metadata:
+      labels:
+        log: "true"
+        app: foo-multi-ctl
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - foo-multi-ctl
+          # requiredDuringSchedulingIgnoredDuringExecution:
+          #   - labelSelector:
+          #     matchExpressions:
+          #       - key: app
+          #         operator: In
+          #         values:
+          #           - foo-multi-ctl
+          #     topologyKey: "kubernetes.io/hostname"
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: foo-multi-ctl
+          image: ${IMAGE}
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            exec:
+              command:
+                - "./foo-multi-ctl"
+                - liveness
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - "./foo-multi-ctl"
+                - readiness
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "20Mi"
+              cpu: "50m"
+            limits:
+              memory: "1000Mi"
+              cpu: "2000m"
+          envFrom:
+            - configMapRef:
+                name: gowins-env
+          volumeMounts:
+            - name: gowins-volume
+              mountPath: app/etc
+      volumes:
+        - name: gowins-volume
+          configMap:
+            name: foo-multi-ctl-conf
+      imagePullSecrets:
+        - name: ggdata-dev
+
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: foo-multi-ctl
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: foo-multi-ctl
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: AverageValue
+          averageValue: 800Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foo-multi-ctl
+  labels:
+    app: foo-multi-ctl
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: foo-multi-ctl
