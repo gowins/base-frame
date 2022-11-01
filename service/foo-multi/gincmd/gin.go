@@ -38,7 +38,7 @@ func main() {
 		// 配置
 		{
 			StepName: "config", Func: func() error {
-				config.FilePath = "./etc"
+				config.ConfigName = "config"
 				config.Setup()
 				return nil
 			},

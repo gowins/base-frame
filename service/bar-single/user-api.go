@@ -38,6 +38,7 @@ func main() {
 		// 配置
 		{
 			StepName: "config", Func: func() error {
+				config.ConfigName = "config"
 				config.Setup()
 				return nil
 			},
