@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gowins/dionysus/ginx"
+	"github.com/spf13/viper"
 )
 
 func TestError(c *gin.Context) ginx.Render {
@@ -25,4 +26,9 @@ func HttpCode(c *gin.Context) ginx.Render {
 	c.Status(http.StatusGatewayTimeout)
 	//c.JSON(http.StatusInternalServerError, "InternalServerError")
 	return ginx.Error(ginx.NewGinError(500100, "内部错误"))
+}
+
+func GetConfig(c *gin.Context) ginx.Render {
+	d := viper.GetDuration("mysql.max-connection-life-time")
+	return ginx.Success(d.Seconds())
 }
