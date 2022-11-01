@@ -1,10 +1,11 @@
 package main
 
 import (
-	"base-frame/service/bar-single/internal/handler"
-	"base-frame/service/bar-single/internal/healthy_checker"
 	"fmt"
 	"log"
+
+	"base-frame/service/bar-single/internal/handler"
+	"base-frame/service/bar-single/internal/healthy_checker"
 
 	"github.com/gowins/dionysus/healthy"
 	"github.com/gowins/dionysus/step"
