@@ -10,7 +10,7 @@ COPY . .
 COPY service/foo-multi/gincmd/etc /app/etc
 RUN go build -ldflags="-s -w" -o /app/dio service/foo-multi/gincmd/gin.go
 
-FROM registry.cn-hangzhou.aliyuncs.com/5eplay/alpine:3.16.3
+FROM registry.cn-hangzhou.aliyuncs.com/5eplay/alpine:3.16.2
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/Shanghai
 ENV TZ Asia/Shanghai

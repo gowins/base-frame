@@ -34,7 +34,7 @@ spec:
           #         values:
           #           - foo-multi-gin
           #     topologyKey: "kubernetes.io/hostname"
-      terminationGracePeriodSeconds: 60
+      terminationGracePeriodSeconds: 120
       containers:
         - name: foo-multi-gin
           image: ${IMAGE}
@@ -43,7 +43,7 @@ spec:
           livenessProbe:
             exec:
               command:
-                - "./foo-multi-gin"
+                - "/app/foo-multi-gin"
                 - liveness
             initialDelaySeconds: 10
             timeoutSeconds: 2
@@ -53,13 +53,17 @@ spec:
           readinessProbe:
             exec:
               command:
-                - "./foo-multi-gin"
+                - "/app/foo-multi-gin"
                 - readiness
             initialDelaySeconds: 10
             timeoutSeconds: 2
             periodSeconds: 3
             successThreshold: 1
             failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep","30"]
           resources:
             requests:
               memory: "20Mi"

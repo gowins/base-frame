@@ -34,7 +34,7 @@ spec:
           #         values:
           #           - foo-multi-ctl
           #     topologyKey: "kubernetes.io/hostname"
-      terminationGracePeriodSeconds: 60
+      terminationGracePeriodSeconds: 120
       containers:
         - name: foo-multi-ctl
           image: ${IMAGE}
@@ -43,23 +43,17 @@ spec:
           livenessProbe:
             exec:
               command:
-                - "./foo-multi-ctl"
+                - "/app/foo-multi-ctl"
                 - liveness
             initialDelaySeconds: 10
             timeoutSeconds: 2
             periodSeconds: 5
             successThreshold: 1
             failureThreshold: 3
-          readinessProbe:
-            exec:
-              command:
-                - "./foo-multi-ctl"
-                - readiness
-            initialDelaySeconds: 10
-            timeoutSeconds: 2
-            periodSeconds: 3
-            successThreshold: 1
-            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep","30"]
           resources:
             requests:
               memory: "20Mi"
@@ -106,17 +100,3 @@ spec:
           type: AverageValue
           averageValue: 800Mi
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: foo-multi-ctl
-  labels:
-    app: foo-multi-ctl
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: 8080
-  selector:
-    app: foo-multi-ctl

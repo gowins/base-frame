@@ -43,7 +43,7 @@ spec:
           livenessProbe:
             exec:
               command:
-                - "./foo-multi-grpc"
+                - "/app/foo-multi-grpc"
                 - liveness
             initialDelaySeconds: 10
             timeoutSeconds: 2
@@ -53,13 +53,17 @@ spec:
           readinessProbe:
             exec:
               command:
-                - "./foo-multi-grpc"
+                - "/app/foo-multi-grpc"
                 - readiness
             initialDelaySeconds: 10
             timeoutSeconds: 2
             periodSeconds: 3
             successThreshold: 1
             failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep","30"]
           resources:
             requests:
               memory: "20Mi"
