@@ -1,0 +1,156 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bar-single-api
+  labels:
+    app: bar-single-api
+spec:
+  selector:
+    matchLabels:
+      app: bar-single-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        log: "true"
+        app: bar-single-api
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - bar-single-api
+          # requiredDuringSchedulingIgnoredDuringExecution:
+          #   - labelSelector:
+          #     matchExpressions:
+          #       - key: app
+          #         operator: In
+          #         values:
+          #           - bar-single-api
+          #     topologyKey: "kubernetes.io/hostname"
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: bar-single-api
+          image: ${IMAGE}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+              name: http-gin
+            - containerPort: 9091
+              protocol: TCP
+              name: http-metrics
+          livenessProbe:
+            exec:
+              command:
+                - "/app/bar-single-api"
+                - liveness
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - "/app/bar-single-api"
+                - readiness
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep","30"]
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "60m"
+            limits:
+              memory: "80Mi"
+              cpu: "100m"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: gowins-env
+          volumeMounts:
+            - name: gowins-volume
+              mountPath: app/etc
+      volumes:
+        - name: gowins-volume
+          configMap:
+            name: bar-single-api-conf
+      imagePullSecrets:
+        - name: ggdata-dev
+      restartPolicy: Always
+
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: bar-single-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: bar-single-api
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: AverageValue
+          averageValue: 60Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bar-single-api
+  labels:
+    app: bar-single-api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: bar-single-api
+
+---
+apiVersion: v1
+data:
+  config.yaml: |-
+    mysql:
+      host: 127.0.0.1:3306
+      user: root
+      password: root
+      database: 5e 
+      charset: utf8mb4
+      max-idle-connections: 100
+      max-open-connections: 100
+      max-connection-life-time: 10s
+kind: ConfigMap
+metadata:
+  name: bar-single-api-conf
+  namespace: base-frame
