@@ -12,12 +12,17 @@ import (
 )
 
 var (
-	FilePath = "./etc/"
-	ViperMap sync.Map
+	FilePath   = "./etc/"
+	ViperMap   sync.Map
+	ConfigName = ""
 )
 
 func Setup() {
-	viper.SetConfigName(env.GetRunEnv())
+	if ConfigName == "" {
+		viper.SetConfigName(env.GetRunEnv())
+	} else {
+		viper.SetConfigName(ConfigName)
+	}
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(FilePath)
 	if err := viper.ReadInConfig(); err != nil {

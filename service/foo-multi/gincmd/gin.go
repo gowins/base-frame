@@ -6,8 +6,8 @@ import (
 
 	"base-frame/common/config"
 	"base-frame/common/env"
-	"base-frame/service/bar-single/internal/handler"
-	"base-frame/service/bar-single/internal/healthy_checker"
+	"base-frame/service/foo-multi/internal/handler"
+	"base-frame/service/foo-multi/internal/healthy_checker"
 
 	"github.com/gowins/dionysus/healthy"
 	"github.com/gowins/dionysus/step"

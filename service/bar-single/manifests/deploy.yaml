@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bar-single
+  name: bar-single-api
   labels:
-    app: bar-single
+    app: bar-single-api
 spec:
   selector:
     matchLabels:
-      app: bar-single
+      app: bar-single-api
   template:
     metadata:
       labels:
         log: "true"
-        app: bar-single
+        app: bar-single-api
     spec:
       affinity:
         podAntiAffinity:
@@ -25,25 +25,25 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - bar-single
+                        - bar-single-api
           # requiredDuringSchedulingIgnoredDuringExecution:
           #   - labelSelector:
           #     matchExpressions:
           #       - key: app
           #         operator: In
           #         values:
-          #           - bar-single
+          #           - bar-single-api
           #     topologyKey: "kubernetes.io/hostname"
-      terminationGracePeriodSeconds: 60
+      terminationGracePeriodSeconds: 120
       containers:
-        - name: bar-single
+        - name: bar-single-api
           image: ${IMAGE}
           ports:
             - containerPort: 8080
           livenessProbe:
             exec:
               command:
-                - "./bar-single"
+                - "/app/bar-single-api"
                 - liveness
             initialDelaySeconds: 10
             timeoutSeconds: 2
@@ -53,13 +53,17 @@ spec:
           readinessProbe:
             exec:
               command:
-                - "./bar-single"
+                - "/app/bar-single-api"
                 - readiness
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             timeoutSeconds: 2
             periodSeconds: 3
             successThreshold: 1
             failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep","30"]
           resources:
             requests:
               memory: "20Mi"
@@ -76,7 +80,7 @@ spec:
       volumes:
         - name: gowins-volume
           configMap:
-            name: bar-single-conf
+            name: bar-single-api-conf
       imagePullSecrets:
         - name: ggdata-dev
 
@@ -84,13 +88,13 @@ spec:
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: bar-single
+  name: bar-single-api
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: bar-single
-  minReplicas: 1
+    name: bar-single-api
+  minReplicas: 2
   maxReplicas: 3
   metrics:
     - type: Resource
@@ -110,13 +114,31 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: bar-single
+  name: bar-single-api
   labels:
-    app: bar-single
+    app: bar-single-api
 spec:
   type: ClusterIP
   ports:
     - port: 8080
       targetPort: 8080
   selector:
-    app: bar-single
+    app: bar-single-api
+
+---
+apiVersion: v1
+data:
+  config.yaml: |-
+    mysql:
+      host: 127.0.0.1:3306
+      user: root
+      password: root
+      database: 5e 
+      charset: utf8mb4
+      max-idle-connections: 100
+      max-open-connections: 100
+      max-connection-life-time: 10s
+kind: ConfigMap
+metadata:
+  name: bar-single-api-conf
+  namespace: base-frame

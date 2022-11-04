@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: foo-multi-ctl
+  name: foo-multi-gin
   labels:
-    app: foo-multi-ctl
+    app: foo-multi-gin
 spec:
   selector:
     matchLabels:
-      app: foo-multi-ctl
+      app: foo-multi-gin
   template:
     metadata:
       labels:
         log: "true"
-        app: foo-multi-ctl
+        app: foo-multi-gin
     spec:
       affinity:
         podAntiAffinity:
@@ -25,29 +25,39 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - foo-multi-ctl
+                        - foo-multi-gin
           # requiredDuringSchedulingIgnoredDuringExecution:
           #   - labelSelector:
           #     matchExpressions:
           #       - key: app
           #         operator: In
           #         values:
-          #           - foo-multi-ctl
+          #           - foo-multi-gin
           #     topologyKey: "kubernetes.io/hostname"
       terminationGracePeriodSeconds: 120
       containers:
-        - name: foo-multi-ctl
+        - name: foo-multi-gin
           image: ${IMAGE}
           ports:
             - containerPort: 8080
           livenessProbe:
             exec:
               command:
-                - "/app/foo-multi-ctl"
+                - "/app/foo-multi-gin"
                 - liveness
             initialDelaySeconds: 10
             timeoutSeconds: 2
             periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - "/app/foo-multi-gin"
+                - readiness
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 3
             successThreshold: 1
             failureThreshold: 3
           lifecycle:
@@ -70,7 +80,7 @@ spec:
       volumes:
         - name: gowins-volume
           configMap:
-            name: foo-multi-ctl-conf
+            name: foo-multi-gin-conf
       imagePullSecrets:
         - name: ggdata-dev
 
@@ -78,12 +88,12 @@ spec:
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: foo-multi-ctl
+  name: foo-multi-gin
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: foo-multi-ctl
+    name: foo-multi-gin
   minReplicas: 1
   maxReplicas: 3
   metrics:
@@ -100,3 +110,17 @@ spec:
           type: AverageValue
           averageValue: 800Mi
 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foo-multi-gin
+  labels:
+    app: foo-multi-gin
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: foo-multi-gin

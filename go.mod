@@ -8,6 +8,7 @@ require (
 	github.com/gowins/dionysus v0.0.0-20221031021117-6d842f2cfef8
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/spf13/viper v1.13.0
+	github.com/zeromicro/go-zero v1.4.1
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
 	gorm.io/gen v0.3.18
@@ -25,7 +26,6 @@ require (
 	github.com/smartystreets/assertions v1.13.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
-	go.uber.org/goleak v1.2.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
