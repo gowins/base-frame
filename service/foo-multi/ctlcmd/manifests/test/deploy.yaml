@@ -8,6 +8,11 @@ spec:
   selector:
     matchLabels:
       app: foo-multi-ctl
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -40,6 +45,11 @@ spec:
           image: ${IMAGE}
           ports:
             - containerPort: 8080
+              protocol: TCP
+              name: http-gin
+            - containerPort: 9091
+              protocol: TCP
+              name: http-metrics
           livenessProbe:
             exec:
               command:
@@ -50,17 +60,28 @@ spec:
             periodSeconds: 5
             successThreshold: 1
             failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - "/app/foo-multi-ctl"
+                - readiness
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
           lifecycle:
             preStop:
               exec:
                 command: ["/bin/sleep","30"]
           resources:
             requests:
-              memory: "20Mi"
-              cpu: "50m"
+              memory: "50Mi"
+              cpu: "60m"
             limits:
-              memory: "1000Mi"
-              cpu: "2000m"
+              memory: "80Mi"
+              cpu: "100m"
+          imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
                 name: gowins-env
@@ -73,6 +94,7 @@ spec:
             name: foo-multi-ctl-conf
       imagePullSecrets:
         - name: ggdata-dev
+      restartPolicy: Always
 
 ---
 apiVersion: autoscaling/v2beta2
@@ -85,7 +107,7 @@ spec:
     kind: Deployment
     name: foo-multi-ctl
   minReplicas: 1
-  maxReplicas: 3
+  maxReplicas: 2
   metrics:
     - type: Resource
       resource:
@@ -98,5 +120,37 @@ spec:
         name: memory
         target:
           type: AverageValue
-          averageValue: 800Mi
+          averageValue: 60Mi
 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foo-multi-ctl
+  labels:
+    app: foo-multi-ctl
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: foo-multi-ctl
+
+---
+apiVersion: v1
+data:
+  config.yaml: |-
+    mysql:
+      host: 127.0.0.1:3306
+      user: root
+      password: root
+      database: 5e 
+      charset: utf8mb4
+      max-idle-connections: 100
+      max-open-connections: 100
+      max-connection-life-time: 10s
+kind: ConfigMap
+metadata:
+  name: foo-multi-ctl-conf
+  namespace: base-frame
