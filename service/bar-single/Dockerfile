@@ -7,7 +7,7 @@ ADD go.mod .
 ADD go.sum .
 RUN go mod download
 COPY . .
-COPY service/bar-single/etc /app/etc
+#COPY service/bar-single/etc /app/etc
 RUN go build -ldflags="-s -w" -o /app/bar-single-api service/bar-single/user-api.go
 
 FROM registry.cn-hangzhou.aliyuncs.com/5eplay/alpine:3.16.2
@@ -16,7 +16,7 @@ COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/S
 ENV TZ Asia/Shanghai
 WORKDIR /app
 COPY --from=builder /app/bar-single-api /app/bar-single-api
-COPY --from=builder /app/etc /app/etc
+#COPY --from=builder /app/etc /app/etc
 #COPY --from=builder /app/manifests /app/manifests
 
 CMD ["./bar-single-api","gin"]

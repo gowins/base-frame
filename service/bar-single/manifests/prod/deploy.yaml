@@ -136,21 +136,3 @@ spec:
       targetPort: 8080
   selector:
     app: bar-single-api
-
----
-apiVersion: v1
-data:
-  config.yaml: |-
-    mysql:
-      host: 127.0.0.1:3306
-      user: root
-      password: root
-      database: 5e 
-      charset: utf8mb4
-      max-idle-connections: 100
-      max-open-connections: 100
-      max-connection-life-time: 10s
-kind: ConfigMap
-metadata:
-  name: bar-single-api-conf
-  namespace: base-frame
