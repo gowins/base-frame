@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"base-frame/common/config"
 	"base-frame/common/env"
 	"base-frame/service/bar-single/internal/handler"
 	"base-frame/service/bar-single/internal/healthy_checker"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/gowins/dionysus"
 	"github.com/gowins/dionysus/cmd"
+	"github.com/gowins/dionysus/config"
 )
 
 func main() {
@@ -38,8 +38,23 @@ func main() {
 		// 配置
 		{
 			StepName: "config", Func: func() error {
-				config.ConfigName = "config"
-				config.Setup()
+				configHandlers := []*config.WatchConfigHandler{
+					{
+						Key: "mysql.host",
+						Func: func(valueString string) error {
+							log.Printf("get mysql.host %v change", valueString)
+							return nil
+						},
+					},
+					{
+						Key: "mysql.database",
+						Func: func(valueString string) error {
+							log.Printf("get mysql.database %v change", valueString)
+							return nil
+						},
+					},
+				}
+				config.Setup(configHandlers...)
 				return nil
 			},
 		},
@@ -50,6 +65,6 @@ func main() {
 		return
 	}
 	if err := d.DioStart("ginxdemo", gcmd); err != nil {
-		fmt.Printf("dio start error %v\n", err)
+		log.Printf("dio start error %v\n", err)
 	}
 }
