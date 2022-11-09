@@ -89,6 +89,10 @@ spec:
           volumeMounts:
             - name: gowins-volume
               mountPath: app/etc
+          dnsConfig:
+            options:
+            - name: ndots
+              value: "2"
       volumes:
         - name: gowins-volume
           configMap:
