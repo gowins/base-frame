@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bar-single-api
+  namespace: base-frame
   labels:
     app: bar-single-api
 spec:
@@ -95,38 +96,12 @@ spec:
       imagePullSecrets:
         - name: ggdata-dev
       restartPolicy: Always
-
----
-apiVersion: autoscaling/v2beta2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: bar-single-api
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: bar-single-api
-  minReplicas: 2
-  maxReplicas: 4
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 60
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: AverageValue
-          averageValue: 600Mi
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: bar-single-api
+  namespace: base-frame
   labels:
     app: bar-single-api
 spec:
