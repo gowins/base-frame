@@ -13,7 +13,6 @@ import (
 
 	"github.com/gowins/dionysus"
 	"github.com/gowins/dionysus/cmd"
-	"github.com/gowins/dionysus/config"
 )
 
 func main() {
@@ -36,28 +35,30 @@ func main() {
 			},
 		},
 		// 配置
-		{
-			StepName: "config", Func: func() error {
-				configHandlers := []*config.WatchConfigHandler{
-					{
-						Key: "mysql.host",
-						Func: func(valueString string) error {
-							log.Printf("get mysql.host %v change", valueString)
-							return nil
+		/*
+			{
+				StepName: "config", Func: func() error {
+					configHandlers := []*config.WatchConfigHandler{
+						{
+							Key: "mysql.host",
+							Func: func(valueString string) error {
+								log.Printf("get mysql.host %v change", valueString)
+								return nil
+							},
 						},
-					},
-					{
-						Key: "mysql.database",
-						Func: func(valueString string) error {
-							log.Printf("get mysql.database %v change", valueString)
-							return nil
+						{
+							Key: "mysql.database",
+							Func: func(valueString string) error {
+								log.Printf("get mysql.database %v change", valueString)
+								return nil
+							},
 						},
-					},
-				}
-				config.Setup(configHandlers...)
-				return nil
+					}
+					config.Setup(configHandlers...)
+					return nil
+				},
 			},
-		},
+		*/
 	}
 	err := d.PreRunStepsAppend(preSteps...)
 	if err != nil {

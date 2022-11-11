@@ -58,7 +58,7 @@ func main() {
 		for {
 			select {
 			case <-timer1.C:
-				rpc_client.GetRPCHello()
+				rpc_client.GetRPCHelloV2()
 			case <-ctlCmd.Ctx.Done():
 				fmt.Printf("this is stopChan %v\n", time.Now().String())
 				return nil

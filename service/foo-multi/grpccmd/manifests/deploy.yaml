@@ -38,12 +38,15 @@ spec:
       containers:
         - name: foo-multi-grpc
           image: ${IMAGE}
+          env:
+            - name: aliyun_logs_foo-multi-grpc
+              value: stdout
           ports:
             - containerPort: 8080
           livenessProbe:
             exec:
               command:
-                - "/app/foo-multi-grpc"
+                - "/app/dio"
                 - liveness
             initialDelaySeconds: 10
             timeoutSeconds: 2
@@ -53,7 +56,7 @@ spec:
           readinessProbe:
             exec:
               command:
-                - "/app/foo-multi-grpc"
+                - "/app/dio"
                 - readiness
             initialDelaySeconds: 10
             timeoutSeconds: 2
@@ -120,7 +123,7 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 8081
+      targetPort: 8081
   selector:
     app: foo-multi-grpc

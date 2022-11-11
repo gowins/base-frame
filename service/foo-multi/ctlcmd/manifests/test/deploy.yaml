@@ -43,6 +43,9 @@ spec:
       containers:
         - name: foo-multi-ctl
           image: ${IMAGE}
+          env:
+            - name: aliyun_logs_foo-multi-ctl
+              value: stdout
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -58,16 +61,6 @@ spec:
             initialDelaySeconds: 10
             timeoutSeconds: 2
             periodSeconds: 5
-            successThreshold: 1
-            failureThreshold: 3
-          readinessProbe:
-            exec:
-              command:
-                - "/app/foo-multi-ctl"
-                - readiness
-            initialDelaySeconds: 20
-            timeoutSeconds: 2
-            periodSeconds: 3
             successThreshold: 1
             failureThreshold: 3
           lifecycle:
@@ -121,36 +114,3 @@ spec:
         target:
           type: AverageValue
           averageValue: 60Mi
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: foo-multi-ctl
-  labels:
-    app: foo-multi-ctl
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: 8080
-  selector:
-    app: foo-multi-ctl
-
----
-apiVersion: v1
-data:
-  config.yaml: |-
-    mysql:
-      host: 127.0.0.1:3306
-      user: root
-      password: root
-      database: 5e 
-      charset: utf8mb4
-      max-idle-connections: 100
-      max-open-connections: 100
-      max-connection-life-time: 10s
-kind: ConfigMap
-metadata:
-  name: foo-multi-ctl-conf
-  namespace: base-frame

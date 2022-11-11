@@ -3,56 +3,56 @@ package main
 import (
 	"base-frame/service/foo-multi/internal/rpc_server"
 	"base-frame/service/foo-multi/internal/user"
+	"github.com/afex/hystrix-go/hystrix"
 	"github.com/gowins/dionysus"
 	"github.com/gowins/dionysus/cmd"
-	"github.com/spf13/cobra"
-	"google.golang.org/grpc"
-	"log"
-	"net"
+	"github.com/gowins/dionysus/grpc/server"
+	"github.com/gowins/dionysus/grpc/serverinterceptors"
+	"os"
+	"strconv"
+	"time"
 )
 
-type grpcCommand struct {
-	cmd    *cobra.Command
-	server *grpc.Server
-	addr   string
-}
+var defaultTimeout = 10
+var defaultMaxConcurrentRequests = 1000
 
-func NewGrpcCommand() *grpcCommand {
-	return &grpcCommand{
-		cmd:  &cobra.Command{Use: "grpc", Short: "Run as grpc server"},
-		addr: ":50051",
-	}
-}
-
-func (g *grpcCommand) GetCmd() *cobra.Command {
-	g.cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		lis, err := net.Listen("tcp", ":50051")
-		if err != nil {
-			log.Printf("listen error %v\n", err)
-			return err
-		}
-		return g.server.Serve(lis)
-	}
-	return g.cmd
-}
-
-func (g *grpcCommand) RegShutdownFunc(stopSteps ...cmd.StopStep) {
-	return
-}
-
-func (g *grpcCommand) GetShutdownFunc() cmd.StopFunc {
-	return func() {
-		g.server.GracefulStop()
-	}
-}
+const (
+	TimeoutEnv               = "GRPC_TIMEOUT"
+	MaxConcurrentRequestsEnv = "GRPC_MAX_REQUEST"
+)
 
 func main() {
-	grpcServer := grpc.NewServer()
-	user.RegisterUserServer(grpcServer, &rpc_server.UserServer{})
-	grpcCmd := NewGrpcCommand()
-	grpcCmd.server = grpcServer
-	d := dionysus.NewDio()
-	if err := d.DioStart("grpcCmd", grpcCmd); err != nil {
-		log.Fatalf("dio start error %v", err)
+	dio := dionysus.NewDio()
+	cfg := server.DefaultCfg
+	cfg.Address = ":8081"
+	c := cmd.NewGrpcCmd(cmd.WithCfg(cfg))
+	c.EnableDebug()
+
+	timeout := os.Getenv(TimeoutEnv)
+	if timeout != "" {
+		if timeoutInt, err := strconv.Atoi(timeout); err != nil && timeoutInt > 0 {
+			defaultTimeout = timeoutInt
+		}
 	}
+
+	maxRequest := os.Getenv(MaxConcurrentRequestsEnv)
+	if maxRequest != "" {
+		if maxRequestInt, err := strconv.Atoi(maxRequest); err != nil && maxRequestInt > 0 {
+			defaultMaxConcurrentRequests = maxRequestInt
+		}
+	}
+
+	c.AddUnaryServerInterceptors(serverinterceptors.HystrixRateLimitUnary(
+		hystrix.CommandConfig{MaxConcurrentRequests: defaultMaxConcurrentRequests},
+	))
+	c.AddUnaryServerInterceptors(serverinterceptors.TimeoutUnary(time.Duration(defaultTimeout) * time.Second))
+	// recover interceptor
+	c.AddUnaryServerInterceptors(serverinterceptors.RecoveryUnary(serverinterceptors.DefaultRecovery()))
+	c.AddStreamServerInterceptors(serverinterceptors.RecoveryStream(serverinterceptors.DefaultRecovery()))
+	// tacing interceptor
+	c.AddUnaryServerInterceptors(serverinterceptors.OpenTracingUnary())
+	c.AddStreamServerInterceptors(serverinterceptors.OpenTracingStream())
+	// register grpc service
+	c.RegisterGrpcService(user.RegisterUserServer, &rpc_server.UserServer{})
+	dio.DioStart("grpc", c)
 }

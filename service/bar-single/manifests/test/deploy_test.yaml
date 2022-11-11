@@ -44,6 +44,9 @@ spec:
       containers:
         - name: bar-single-api
           image: ${IMAGE}
+          env:
+            - name: aliyun_logs_bar-single-api
+              value: stdout
           ports:
             - containerPort: 8080
               protocol: TCP
